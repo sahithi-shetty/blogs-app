@@ -1,23 +1,21 @@
-import Link from "next/link"
-import "./globals.css"
+import Link from "next/link";
+import "./globals.css";
+import AuthSessionProvider from "./components/SessionProvider";
+import NavBar from "./components/NavBar";
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en">
       <body>
-        <nav>
-          <Link href="/">Home</Link>
-          {" | "}
-          <Link href="/blogs">Blogs</Link>
-          <Link href="/users">Users</Link>
-        </nav>
-
-        {children}
+        <AuthSessionProvider>
+          <NavBar />
+          {children}
+        </AuthSessionProvider>
       </body>
     </html>
-  )
+  );
 }

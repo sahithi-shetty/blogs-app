@@ -5,10 +5,13 @@ import {
   integer,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
+
+
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: varchar("username").notNull().unique(),
   name: varchar("name").notNull(),
+  passwordHash: varchar("password_hash").notNull().default(""),
 });
 
 
