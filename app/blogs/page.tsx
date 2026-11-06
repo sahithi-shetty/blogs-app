@@ -1,7 +1,8 @@
 import { Suspense } from "react";
-import { blogs } from "./data";
+import { db } from "@/db";
+import { blogs } from "@/db/schema";
+import { desc, ilike } from "drizzle-orm";
 import Link from "next/link";
-
 
 type Props = {
   searchParams: Promise<{ filter?: string }>;
@@ -11,11 +12,11 @@ async function BlogList({ searchParams }: Props) {
   const params = await searchParams;
   const filter = params.filter || "";
 
-  const filteredBlogs = blogs
-    .filter((blog) =>
-      blog.title.toLowerCase().includes(filter.toLowerCase())
-    )
-    .sort((a, b) => b.likes - a.likes);
+  const filteredBlogs = await db
+    .select()
+    .from(blogs)
+    .where(filter ? ilike(blogs.title, `%${filter}%`) : undefined)
+    .orderBy(desc(blogs.likes));
 
   return (
     <main
@@ -42,19 +43,7 @@ async function BlogList({ searchParams }: Props) {
           }}
         />
 
-        <button
-          type="submit"
-          style={{
-            padding: "10px 20px",
-            backgroundColor: "#2563eb",
-            color: "white",
-            border: "none",
-            borderRadius: "5px",
-            cursor: "pointer",
-          }}
-        >
-          Search
-        </button>
+        <button type="submit">Search</button>
       </form>
 
       {filteredBlogs.length === 0 ? (
@@ -73,8 +62,11 @@ async function BlogList({ searchParams }: Props) {
             }}
           >
             <h3>
-  <Link href={`/blogs/${blog.id}`}>{blog.title}</Link>
-</h3>
+              <Link href={`/blogs/${blog.id}`}>
+                {blog.title}
+              </Link>
+            </h3>
+
             <p>Author: {blog.author}</p>
             <p>
               URL: <a href={blog.url}>{blog.url}</a>

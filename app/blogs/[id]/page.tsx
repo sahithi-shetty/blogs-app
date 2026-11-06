@@ -1,5 +1,7 @@
 import { Suspense } from "react";
-import { blogs } from "../data";
+import { db } from "@/db";
+import { blogs } from "@/db/schema";
+import { eq } from "drizzle-orm";
 import { likeBlog } from "../actions";
 import Link from "next/link";
 
@@ -10,7 +12,12 @@ type Props = {
 async function BlogDetails({ params }: Props) {
   const { id } = await params;
 
-  const blog = blogs.find((blog) => blog.id === Number(id));
+  const result = await db
+    .select()
+    .from(blogs)
+    .where(eq(blogs.id, Number(id)));
+
+  const blog = result[0];
 
   if (!blog) {
     return <h2>Blog not found</h2>;
